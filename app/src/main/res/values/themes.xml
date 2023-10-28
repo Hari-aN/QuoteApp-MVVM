@@ -5,5 +5,10 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.QuoteAppMVVM" parent="Base.Theme.QuoteAppMVVM" />
+    <style name="Theme.QuoteAppMVVM" parent="Base.Theme.QuoteAppMVVM" >
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>
