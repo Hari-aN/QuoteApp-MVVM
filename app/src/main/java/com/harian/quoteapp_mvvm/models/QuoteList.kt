@@ -1,4 +1,4 @@
-package com.harian.quoteapp_mvvm
+package com.harian.quoteapp_mvvm.models
 
 data class QuoteList(
     val count: Int,

@@ -1,15 +1,18 @@
 package com.harian.quoteapp_mvvm
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings.Global
-import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.harian.quoteapp_mvvm.api.QuoteService
+import com.harian.quoteapp_mvvm.api.RetrofitHelper
+import com.harian.quoteapp_mvvm.models.Result
+import com.harian.quoteapp_mvvm.repository.QuoteRepository
+import com.harian.quoteapp_mvvm.viewmodels.QuoteViewModel
+import com.harian.quoteapp_mvvm.viewmodels.QuoteViewModelFactory
 
 class MainActivity : AppCompatActivity() {
     lateinit var quoteViewModel: QuoteViewModel
@@ -23,39 +26,39 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val quotesAPI = RetrofitHelper.getInstance().create(QuotesAPI::class.java)
-        GlobalScope.launch {
-            val result = quotesAPI.getQuotes(1)
-            if (result != null) {
-                Log.d("Harian : ", result.body().toString())
-            }
-        }
-
+        val quoteService = RetrofitHelper.getInstance().create(QuoteService::class.java)
+        val repository = QuoteRepository(quoteService)
         quoteViewModel = ViewModelProvider(
             this,
-            QuoteViewModelFactory(application)
+            QuoteViewModelFactory(repository)
         ).get(QuoteViewModel::class.java)
 
-        setQuote(quoteViewModel.getQuote())
+        quoteViewModel.quotes.observe(this, Observer {
+            updateUI()
+        })
     }
 
-    fun setQuote(quote: Quote) {
-        quoteText.text = quote.text
+    fun updateUI() {
+        quoteViewModel.getQuote()?.let { setQuote(it) }
+    }
+
+    fun setQuote(quote: Result) {
+        quoteText.text = quote.content
         quoteAuthor.text = quote.author
     }
 
     fun onShare(view: View) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.setType("text/plain")
-        intent.putExtra(Intent.EXTRA_TEXT, quoteViewModel.getQuote().text)
+        intent.putExtra(Intent.EXTRA_TEXT, quoteViewModel.getQuote()?.content)
         startActivity(intent)
     }
 
     fun onNext(view: View) {
-        setQuote(quoteViewModel.getNextQuote())
+        quoteViewModel.getNextQuote()?.let { setQuote(it) }
     }
 
     fun onPrevious(view: View) {
-        setQuote(quoteViewModel.getPreviousQuote())
+        quoteViewModel.getPreviousQuote()?.let { setQuote(it) }
     }
 }
