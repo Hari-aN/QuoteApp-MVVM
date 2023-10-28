@@ -3,9 +3,13 @@ package com.harian.quoteapp_mvvm
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings.Global
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     lateinit var quoteViewModel: QuoteViewModel
@@ -18,6 +22,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val quotesAPI = RetrofitHelper.getInstance().create(QuotesAPI::class.java)
+        GlobalScope.launch {
+            val result = quotesAPI.getQuotes(1)
+            if (result != null) {
+                Log.d("Harian : ", result.body().toString())
+            }
+        }
 
         quoteViewModel = ViewModelProvider(
             this,
