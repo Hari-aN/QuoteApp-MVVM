@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harian.quoteapp_mvvm.models.QuoteList
 import com.harian.quoteapp_mvvm.repository.QuoteRepository
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -12,8 +13,11 @@ class QuoteViewModel(private val repository: QuoteRepository) : ViewModel() {
     private var index = 0
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getQuotes(1)
+        val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+        }
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            repository.getQuotesFromAPI(1)
         }
     }
 

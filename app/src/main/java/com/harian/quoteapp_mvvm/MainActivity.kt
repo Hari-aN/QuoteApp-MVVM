@@ -26,13 +26,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val quoteService = RetrofitHelper.getInstance().create(QuoteService::class.java)
-        val repository = QuoteRepository(quoteService)
+        val repository = (application as QuoteApplication).quoteRepository
         quoteViewModel = ViewModelProvider(
             this,
             QuoteViewModelFactory(repository)
         ).get(QuoteViewModel::class.java)
 
+        //Here Observing the LiveData of QuoteList
         quoteViewModel.quotes.observe(this, Observer {
             updateUI()
         })
