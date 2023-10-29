@@ -17,7 +17,7 @@ class QuoteApplication : Application() {
     private fun initialize() {
         val quoteService = RetrofitHelper.getInstance().create(QuoteService::class.java)
         val quotedatabase = QuoteDatabase.getDatabase(applicationContext)
-        quoteRepository = QuoteRepository(quoteService, quotedatabase)
+        quoteRepository = QuoteRepository(quoteService, quotedatabase, applicationContext)
     }
 
 }
